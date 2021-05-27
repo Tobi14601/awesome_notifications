@@ -64,6 +64,7 @@ public class NotificationBuilder {
             Definitions.SELECT_NOTIFICATION,
             pushNotification
         );
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         Intent deleteIntent = buildNotificationIntentFromModel(
             context,
@@ -409,7 +410,7 @@ public class NotificationBuilder {
                 Definitions.NOTIFICATION_BUTTON_ACTION_PREFIX + "_" + buttonProperties.key,
                 pushNotification,
                 (buttonProperties.buttonType == ActionButtonType.DisabledAction) ? AwesomeNotificationsPlugin.class :
-                (buttonProperties.buttonType == ActionButtonType.KeepOnTop) ?
+                (buttonProperties.buttonType == ActionButtonType.KeepOnTop || buttonProperties.buttonType == ActionButtonType.InputField) ?
                         KeepOnTopActionReceiver.class : getNotificationTargetActivityClass(context)
             );
 
@@ -422,7 +423,8 @@ public class NotificationBuilder {
 
             if(buttonProperties.enabled){
 
-                if(buttonProperties.buttonType == ActionButtonType.KeepOnTop) {
+                if(buttonProperties.buttonType == ActionButtonType.KeepOnTop
+                        || buttonProperties.buttonType == ActionButtonType.InputField) {
 
                     actionPendingIntent = PendingIntent.getBroadcast(
                             context,

@@ -80,6 +80,8 @@ public class AwesomeNotificationsPlugin
         extends BroadcastReceiver
         implements FlutterPlugin, MethodCallHandler, PluginRegistry.NewIntentListener, ActivityAware {
 
+    public static AwesomeNotificationsPlugin plugin;
+
     public static Boolean debug = false;
     public static Boolean hasGooglePlayServices;
 
@@ -91,7 +93,15 @@ public class AwesomeNotificationsPlugin
     private MethodChannel pluginChannel;
     private Context applicationContext;
 
+    private List<ToDoCall> calls = new ArrayList<>();
+
     public static MediaSessionCompat mediaSession;
+
+    public AwesomeNotificationsPlugin() {
+        if (plugin == null) {
+            plugin = this;
+        }
+    }
 
     private boolean checkGooglePlayServices() {
         // TODO MISSING IMPLEMENTATION. FIREBASE SERVICES DEMANDS GOOGLE PLAY SERVICES.
@@ -156,6 +166,11 @@ public class AwesomeNotificationsPlugin
         pluginChannel = channel;
 
         pluginChannel.setMethodCallHandler(this);
+
+        for (ToDoCall call : this.calls) {
+            pluginChannel.invokeMethod(call.action, call.object);
+        }
+        calls.clear();
 
         hasGooglePlayServices = checkGooglePlayServices();
 
@@ -282,7 +297,7 @@ public class AwesomeNotificationsPlugin
 
     // private void onBroadcastNewFcmToken(Intent intent) {
     //     String token = intent.getStringExtra(Definitions.EXTRA_BROADCAST_FCM_TOKEN);
-    //     pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_NEW_FCM_TOKEN, token);
+    //     invokeMethod(Definitions.CHANNEL_METHOD_NEW_FCM_TOKEN, token);
     // }
 
     private void onBroadcastNotificationCreated(Intent intent) {
@@ -300,7 +315,7 @@ public class AwesomeNotificationsPlugin
             CreatedManager.removeCreated(applicationContext, received.id);
             CreatedManager.commitChanges(applicationContext);
 
-            pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_CREATED, content);
+            invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_CREATED, content);
             
             if(AwesomeNotificationsPlugin.debug)
                 Log.d(TAG, "Notification created");
@@ -316,7 +331,7 @@ public class AwesomeNotificationsPlugin
         try {
 
             Serializable serializable = intent.getSerializableExtra(Definitions.EXTRA_BROADCAST_MESSAGE);
-            pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_RECEIVED_ACTION, serializable);
+            invokeMethod(Definitions.CHANNEL_METHOD_RECEIVED_ACTION, serializable);
 
             if(AwesomeNotificationsPlugin.debug)
                 Log.d(TAG, "Notification action received");
@@ -332,7 +347,7 @@ public class AwesomeNotificationsPlugin
         try {
 
             Serializable serializable = intent.getSerializableExtra(Definitions.EXTRA_BROADCAST_MESSAGE);
-            pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_MEDIA_BUTTON, serializable);
+            invokeMethod(Definitions.CHANNEL_METHOD_MEDIA_BUTTON, serializable);
 
             if(AwesomeNotificationsPlugin.debug)
                 Log.d(TAG, "Notification action received");
@@ -359,7 +374,7 @@ public class AwesomeNotificationsPlugin
             DisplayedManager.removeDisplayed(applicationContext, received.id);
             DisplayedManager.commitChanges(applicationContext);
 
-            pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_DISPLAYED, content);
+            invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_DISPLAYED, content);
 
             if(AwesomeNotificationsPlugin.debug)
                 Log.d(TAG, "Notification displayed");
@@ -386,7 +401,7 @@ public class AwesomeNotificationsPlugin
             DismissedManager.removeDismissed(applicationContext, received.id);
             DisplayedManager.commitChanges(applicationContext);
 
-            pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_DISMISSED, content);
+            invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_DISMISSED, content);
 
             if(AwesomeNotificationsPlugin.debug)
                 Log.d(TAG, "Notification dismissed");
@@ -406,7 +421,7 @@ public class AwesomeNotificationsPlugin
                 try {
 
                     created.validate(applicationContext);
-                    pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_CREATED, created.toMap());
+                    invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_CREATED, created.toMap());
                     CreatedManager.removeCreated(context, created.id);
                     CreatedManager.commitChanges(context);
 
@@ -427,7 +442,7 @@ public class AwesomeNotificationsPlugin
                 try {
 
                     displayed.validate(applicationContext);
-                    pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_DISPLAYED, displayed.toMap());
+                    invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_DISPLAYED, displayed.toMap());
                     DisplayedManager.removeDisplayed(context, displayed.id);
                     DisplayedManager.commitChanges(context);
 
@@ -448,7 +463,7 @@ public class AwesomeNotificationsPlugin
                 try {
 
                     received.validate(applicationContext);
-                    pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_DISMISSED, received.toMap());
+                    invokeMethod(Definitions.CHANNEL_METHOD_NOTIFICATION_DISMISSED, received.toMap());
                     DismissedManager.removeDismissed(context, received.id);
                     DismissedManager.commitChanges(context);
 
@@ -1042,7 +1057,7 @@ public class AwesomeNotificationsPlugin
         }
     }
 
-    private Boolean receiveNotificationAction(Intent intent) {
+    public Boolean receiveNotificationAction(Intent intent) {
         return receiveNotificationAction(intent, getApplicationLifeCycle());
     }
 
@@ -1057,12 +1072,31 @@ public class AwesomeNotificationsPlugin
 
             Map<String, Object> returnObject = actionModel.toMap();
 
-            pluginChannel.invokeMethod(Definitions.CHANNEL_METHOD_RECEIVED_ACTION, returnObject);
+            invokeMethod(Definitions.CHANNEL_METHOD_RECEIVED_ACTION, returnObject);
 
             if(AwesomeNotificationsPlugin.debug)
                 Log.d(TAG, "Notification action received");
         }
         return true;
+    }
+
+    private void invokeMethod(String action, Object object) {
+        if (pluginChannel != null) {
+            pluginChannel.invokeMethod(action, object);
+        } else {
+            calls.add(new ToDoCall(action, object));
+        }
+    }
+
+    private class ToDoCall {
+
+        private String action;
+        private Object object;
+
+        public ToDoCall(String action, Object object) {
+            this.action = action;
+            this.object = object;
+        }
     }
 
 }
