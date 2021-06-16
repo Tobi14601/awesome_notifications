@@ -706,7 +706,7 @@ public class SwiftAwesomeNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-		
+		print("handle " + call.method)
 		do {
 		
 			switch call.method {
