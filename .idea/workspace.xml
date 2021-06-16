@@ -27,14 +27,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e193cc25-4aee-4ee7-85e6-38b386ea7f1b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/me/carda/awesome_notifications/AwesomeNotificationsPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/me/carda/awesome_notifications/AwesomeNotificationsPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/me/carda/awesome_notifications/notifications/NotificationBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/me/carda/awesome_notifications/notifications/NotificationBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/example/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesome_notifications.iml" beforeDir="false" afterPath="$PROJECT_DIR$/awesome_notifications.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/lib/SwiftAwesomeNotificationsPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/lib/SwiftAwesomeNotificationsPlugin.swift" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -132,6 +127,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -147,18 +143,9 @@
       <screen x="0" y="0" width="2560" height="1040" />
     </state>
     <state x="963" y="192" key="#com.intellij.refactoring.encapsulateFields.EncalpsulateFieldsDialog/0.0.2560.1040/451.-900.1600.900@0.0.2560.1040" timestamp="1615553325864" />
-    <state x="1498" y="226" key="#xdebugger.evaluate" timestamp="1614899259509">
-      <screen x="0" y="0" width="2560" height="1040" />
-    </state>
-    <state x="1498" y="226" key="#xdebugger.evaluate/0.0.2560.1040/451.-900.1600.900@0.0.2560.1040" timestamp="1614899259509" />
-    <state x="92" y="92" width="2376" height="856" key="AVDManager" timestamp="1614884706846">
-      <screen x="0" y="0" width="2560" height="1040" />
-    </state>
-    <state x="92" y="92" width="2376" height="856" key="AVDManager/0.0.2560.1040/451.-900.1600.900@0.0.2560.1040" timestamp="1614884706846" />
     <state x="784" y="290" width="412" height="525" key="AndroidProcessChooserDialog" timestamp="1621215541972">
       <screen x="0" y="0" width="2560" height="1040" />
     </state>
-    <state x="784" y="290" width="412" height="525" key="AndroidProcessChooserDialog/0.0.2560.1040/451.-900.1600.900@0.0.2560.1040" timestamp="1614899766283" />
     <state x="784" y="290" key="AndroidProcessChooserDialog/0.0.2560.1040@0.0.2560.1040" timestamp="1621215541972" />
     <state width="714" height="438" key="DebuggerActiveHint" timestamp="1621195359692">
       <screen x="0" y="0" width="2560" height="1040" />
@@ -216,24 +203,19 @@
       <screen x="0" y="25" width="1552" height="943" />
     </state>
     <state x="233" y="208" width="1097" height="647" key="dock-window-1/0.25.1552.943@0.25.1552.943" timestamp="1615329722992" />
-    <state x="1109" y="207" width="723" height="884" key="find.popup" timestamp="1622126401612">
-      <screen x="0" y="25" width="1920" height="1096" />
+    <state x="1109" y="206" width="723" height="880" key="find.popup" timestamp="1623826779725">
+      <screen x="0" y="25" width="1920" height="1090" />
     </state>
     <state x="881" y="304" width="964" height="606" key="find.popup/0.0.2560.1040/451.-900.1600.900@0.0.2560.1040" timestamp="1615522635501" />
     <state x="1479" y="173" width="964" height="838" key="find.popup/0.0.2560.1040@0.0.2560.1040" timestamp="1621215412423" />
     <state x="670" y="118" width="717" height="760" key="find.popup/0.25.1904.943@0.25.1904.943" timestamp="1620167419697" />
+    <state x="1109" y="206" width="723" height="880" key="find.popup/0.25.1920.1090/1920.25.1792.1095@0.25.1920.1090" timestamp="1623826779725" />
     <state x="1109" y="207" width="723" height="884" key="find.popup/0.25.1920.1096/1920.202.1792.1095@0.25.1920.1096" timestamp="1622126401612" />
-    <state x="661" y="301" width="723" height="550" key="find.popup/0.25.1920.943@0.25.1920.943" timestamp="1614978540238" />
-    <state x="661" y="306" width="1078" height="560" key="find.popup/0.25.1920.959@0.25.1920.959" timestamp="1615153580889" />
     <state x="702" y="206" width="670" height="713" key="search.everywhere.popup" timestamp="1622126587279">
       <screen x="0" y="25" width="1920" height="1096" />
     </state>
     <state x="936" y="172" width="672" height="676" key="search.everywhere.popup/0.0.2560.1040@0.0.2560.1040" timestamp="1619366376321" />
     <state x="702" y="206" width="670" height="713" key="search.everywhere.popup/0.25.1920.1096/1920.202.1792.1095@0.25.1920.1096" timestamp="1622126587279" />
-    <state x="690" y="338" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1614979209639">
-      <screen x="0" y="25" width="1920" height="943" />
-    </state>
-    <state x="690" y="338" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/0.25.1920.943@0.25.1920.943" timestamp="1614979209639" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

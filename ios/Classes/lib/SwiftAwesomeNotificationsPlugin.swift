@@ -1119,7 +1119,7 @@ public class SwiftAwesomeNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
     }
 
     private func channelMethodCreateNotification(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
-        
+        print("channelMethodCreateNotification")
 		let pushData:[String:Any?] = call.arguments as? [String:Any?] ?? [:]
 		let pushNotification:PushNotification? = PushNotification().fromMap(arguments: pushData) as? PushNotification
 		
