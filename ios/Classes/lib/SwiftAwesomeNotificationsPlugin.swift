@@ -1124,7 +1124,8 @@ public class SwiftAwesomeNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
 		let pushNotification:PushNotification? = PushNotification().fromMap(arguments: pushData) as? PushNotification
 		
 		if(pushNotification != nil){
-				
+		    print("pushNotification != nil")
+
 			if #available(iOS 10.0, *) {
 				try NotificationSenderAndScheduler().send(
 					createdSource: NotificationSource.Local,
@@ -1132,22 +1133,26 @@ public class SwiftAwesomeNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
 					completion: { sent, content, error in
 					
 						if error != nil {
+						    print("has error")
 							let flutterError:FlutterError?
 							if let notificationError = error as? AwesomeNotificationsException {
 								switch notificationError {
 									case AwesomeNotificationsException.notificationNotAuthorized:
+									print("not authorized")
 										flutterError = FlutterError.init(
 											code: "notificationNotAuthorized",
 											message: "Notifications are disabled",
 											details: nil
 										)
 									case AwesomeNotificationsException.cronException:
+									print("cron error")
 										flutterError = FlutterError.init(
 											code: "cronException",
 											message: notificationError.localizedDescription,
 											details: nil
 										)
 									default:
+									print("other")
 										flutterError = FlutterError.init(
 											code: "exception",
 											message: "Unknow error",
@@ -1156,6 +1161,7 @@ public class SwiftAwesomeNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
 								}
 							}
 							else {
+							print("general")
 								flutterError = FlutterError.init(
 									code: error.debugDescription,
 									message: error?.localizedDescription,
@@ -1166,6 +1172,7 @@ public class SwiftAwesomeNotificationsPlugin: NSObject, FlutterPlugin, UNUserNot
 							return
 						}
 						else {
+						print("result " + sent)
 							result(sent)
 							return
 						}
