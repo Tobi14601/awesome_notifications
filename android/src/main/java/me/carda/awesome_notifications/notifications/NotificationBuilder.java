@@ -677,7 +677,7 @@ public class NotificationBuilder {
                             context,
                             notificationModel.content.id,
                             actionIntent,
-                            PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+                            PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
                     );
 
                 } else if (buttonProperties.buttonType == ActionButtonType.DisabledAction) {
