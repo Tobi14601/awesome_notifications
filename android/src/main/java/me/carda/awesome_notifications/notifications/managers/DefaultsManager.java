@@ -2,18 +2,16 @@ package me.carda.awesome_notifications.notifications.managers;
 
 import android.content.Context;
 
-import com.google.common.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.List;
-
-import me.carda.awesome_notifications.AwesomeNotificationsPlugin;
 import me.carda.awesome_notifications.Definitions;
 import me.carda.awesome_notifications.notifications.models.DefaultsModel;
 
 public class DefaultsManager {
 
-    private static final SharedManager<DefaultsModel> shared = new SharedManager<>("DefaultsManager", DefaultsModel.class);
+    private static final SharedManager<DefaultsModel> shared
+            = new SharedManager<>(
+                    "DefaultsManager",
+                    DefaultsModel.class,
+                    "DefaultsModel");
 
     public static Boolean removeDefault(Context context) {
         return shared.remove(context, Definitions.SHARED_DEFAULTS, "Defaults");

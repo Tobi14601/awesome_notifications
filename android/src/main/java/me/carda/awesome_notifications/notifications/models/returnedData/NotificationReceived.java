@@ -1,13 +1,8 @@
 package me.carda.awesome_notifications.notifications.models.returnedData;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import me.carda.awesome_notifications.AwesomeNotificationsPlugin;
-import me.carda.awesome_notifications.Definitions;
-import me.carda.awesome_notifications.notifications.models.Model;
 import me.carda.awesome_notifications.notifications.models.NotificationContentModel;
-import me.carda.awesome_notifications.notifications.models.PushNotification;
 
 // Just created because of Json process
 public class NotificationReceived extends NotificationContentModel {
@@ -17,24 +12,29 @@ public class NotificationReceived extends NotificationContentModel {
     public NotificationReceived(NotificationContentModel contentModel){
         /*
         if(contentModel == null)
-            throw new PushNotificationException("Notification Received was lost");
+            throw new NotificationModelException("Notification Received was lost");
         */
         this.id = contentModel.id;
         this.channelKey = contentModel.channelKey;
+        this.groupKey = contentModel.groupKey;
         this.title = contentModel.title;
         this.body = contentModel.body;
         this.summary = contentModel.summary;
         this.showWhen = contentModel.showWhen;
-        this.actionButtons = contentModel.actionButtons;
         this.payload = contentModel.payload;
         this.largeIcon = contentModel.largeIcon;
         this.bigPicture = contentModel.bigPicture;
         this.hideLargeIconOnExpand = contentModel.hideLargeIconOnExpand;
-        this.autoCancel = contentModel.autoCancel;
+        this.autoDismissible = contentModel.autoDismissible;
         this.color = contentModel.color;
+        this.backgroundColor = contentModel.backgroundColor;
         this.progress = contentModel.progress;
         this.ticker = contentModel.ticker;
         this.locked = contentModel.locked;
+
+        this.fullScreenIntent = contentModel.fullScreenIntent;
+        this.wakeUpScreen = contentModel.wakeUpScreen;
+        this.category = contentModel.category;
 
         this.notificationLayout = contentModel.notificationLayout;
 

@@ -3,13 +3,14 @@ package me.carda.awesome_notifications;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.carda.awesome_notifications.notifications.enumeratos.ActionButtonType;
-import me.carda.awesome_notifications.notifications.enumeratos.DefaultRingtoneType;
-import me.carda.awesome_notifications.notifications.enumeratos.GroupAlertBehaviour;
-import me.carda.awesome_notifications.notifications.enumeratos.GroupSort;
-import me.carda.awesome_notifications.notifications.enumeratos.NotificationImportance;
-import me.carda.awesome_notifications.notifications.enumeratos.NotificationLayout;
-import me.carda.awesome_notifications.notifications.enumeratos.NotificationPrivacy;
+import me.carda.awesome_notifications.notifications.enumerators.ActionButtonType;
+import me.carda.awesome_notifications.notifications.enumerators.DefaultRingtoneType;
+import me.carda.awesome_notifications.notifications.enumerators.GroupAlertBehaviour;
+import me.carda.awesome_notifications.notifications.enumerators.GroupSort;
+import me.carda.awesome_notifications.notifications.enumerators.NotificationImportance;
+import me.carda.awesome_notifications.notifications.enumerators.NotificationLayout;
+import me.carda.awesome_notifications.notifications.enumerators.NotificationPrivacy;
+import me.carda.awesome_notifications.utils.DateUtils;
 
 public interface Definitions {
 
@@ -22,10 +23,11 @@ public interface Definitions {
     String MEDIA_VALID_ASSET = "^asset?:\\/\\/";
     String MEDIA_VALID_RESOURCE = "^resource?:\\/\\/";
 
+    String BADGE_COUNT = "badgeCount";
     String INITIALIZE_DEBUG_MODE = "debug";
-    String INITIALIZE_CHANNELS = "initializeChannels";
     String INITIALIZE_DEFAULT_ICON = "defaultIcon";
-    String INITIALIZE_REQUIRE_PERMISSION = "requirePermission";
+    String INITIALIZE_CHANNELS = "initializeChannels";
+    String INITIALIZE_CHANNEL_GROUPS = "initializeChannelGroups";
 
     String BROADCAST_CREATED_NOTIFICATION   = "broadcast.awesome_notifications.CREATED_NOTIFICATION";
     String BROADCAST_DISPLAYED_NOTIFICATION = "broadcast.awesome_notifications.DISPLAYED_NOTIFICATION";
@@ -34,14 +36,15 @@ public interface Definitions {
     String BROADCAST_KEEP_ON_TOP ="broadcast.awesome_notifications.KEEP_ON_TOP";
     String EXTRA_BROADCAST_MESSAGE = "notification";
 
-    String PUSH_NOTIFICATION_CONTENT = "content";
-    String PUSH_NOTIFICATION_SCHEDULE = "schedule";
-    String PUSH_NOTIFICATION_BUTTONS = "actionButtons";
+    String NOTIFICATION_MODEL_CONTENT = "content";
+    String NOTIFICATION_MODEL_SCHEDULE = "schedule";
+    String NOTIFICATION_MODEL_BUTTONS = "actionButtons";
 
     String SHARED_DEFAULTS = "defaults";
     String SHARED_MANAGER = "sharedManager";
     String SHARED_CHANNELS = "channels";
     String SHARED_CREATED = "created";
+    String SHARED_CHANNEL_GROUP = "channelGroup";
     String SHARED_DISPLAYED = "displayed";
     String SHARED_DISMISSED = "dismissed";
     String SHARED_SCHEDULED_NOTIFICATIONS = "schedules";
@@ -62,15 +65,30 @@ public interface Definitions {
     String CHANNEL_METHOD_SET_NOTIFICATION_CHANNEL = "setNotificationChannel";
     String CHANNEL_METHOD_REMOVE_NOTIFICATION_CHANNEL = "removeNotificationChannel";
 
+    String CHANNEL_METHOD_SHOW_NOTIFICATION_PAGE = "showNotificationPage";
+    String CHANNEL_METHOD_SHOW_ALARM_PAGE = "showAlarmPage";
+    String CHANNEL_METHOD_SHOW_GLOBAL_DND_PAGE = "showGlobalDndPage";
     String CHANNEL_METHOD_IS_NOTIFICATION_ALLOWED = "isNotificationAllowed";
     String CHANNEL_METHOD_REQUEST_NOTIFICATIONS = "requestNotifications";
+    String CHANNEL_METHOD_CHECK_PERMISSIONS = "checkPermissions";
+    String CHANNEL_METHOD_SHOULD_SHOW_RATIONALE = "shouldShowRationale";
+
     String CHANNEL_METHOD_GET_BADGE_COUNT = "getBadgeCount";
     String CHANNEL_METHOD_SET_BADGE_COUNT = "setBadgeCount";
-    String CHANNEL_METHOD_GET_NEXT_DATE = "getNextDate";
+    String CHANNEL_METHOD_INCREMENT_BADGE_COUNT = "incBadgeCount";
+    String CHANNEL_METHOD_DECREMENT_BADGE_COUNT = "decBadgeCount";
     String CHANNEL_METHOD_RESET_BADGE = "resetBadge";
+
+    String CHANNEL_METHOD_GET_NEXT_DATE = "getNextDate";
     String CHANNEL_METHOD_DISMISS_NOTIFICATION = "dismissNotification";
     String CHANNEL_METHOD_CANCEL_NOTIFICATION = "cancelNotification";
     String CHANNEL_METHOD_CANCEL_SCHEDULE = "cancelSchedule";
+    String CHANNEL_METHOD_DISMISS_NOTIFICATIONS_BY_CHANNEL_KEY = "dismissNotificationsByChannelKey";
+    String CHANNEL_METHOD_CANCEL_NOTIFICATIONS_BY_CHANNEL_KEY = "cancelNotificationsByChannelKey";
+    String CHANNEL_METHOD_CANCEL_SCHEDULES_BY_CHANNEL_KEY = "cancelSchedulesByChannelKey";
+    String CHANNEL_METHOD_DISMISS_NOTIFICATIONS_BY_GROUP_KEY = "dismissNotificationsByGroupKey";
+    String CHANNEL_METHOD_CANCEL_NOTIFICATIONS_BY_GROUP_KEY = "cancelNotificationsByGroupKey";
+    String CHANNEL_METHOD_CANCEL_SCHEDULES_BY_GROUP_KEY = "cancelSchedulesByGroupKey";
     String CHANNEL_METHOD_DISMISS_ALL_NOTIFICATIONS = "dismissAllNotifications";
     String CHANNEL_METHOD_CANCEL_ALL_SCHEDULES = "cancelAllSchedules";
     String CHANNEL_METHOD_CANCEL_ALL_NOTIFICATIONS = "cancelAllNotifications";
@@ -80,6 +98,9 @@ public interface Definitions {
     String CHANNEL_METHOD_NOTIFICATION_DISMISSED = "notificationDismissed";
     String CHANNEL_METHOD_RECEIVED_ACTION = "receivedAction";
     String CHANNEL_METHOD_MEDIA_BUTTON = "mediaButton";
+
+    String CHANNEL_METHOD_START_FOREGROUND = "startForeground";
+    String CHANNEL_METHOD_STOP_FOREGROUND = "stopForeground";
 
     String CHANNEL_METHOD_LIST_ALL_SCHEDULES = "listAllSchedules";
     String CHANNEL_FORCE_UPDATE = "forceUpdate";
@@ -99,6 +120,7 @@ public interface Definitions {
     String NOTIFICATION_SCHEDULE_CREATED_DATE = "createdDate";
     String NOTIFICATION_SCHEDULE_ERA = "era";
     String NOTIFICATION_SCHEDULE_TIMEZONE = "timeZone";
+    String NOTIFICATION_SCHEDULE_PRECISE_ALARM = "preciseAlarm";
     String NOTIFICATION_SCHEDULE_YEAR = "year";
     String NOTIFICATION_SCHEDULE_MONTH = "month";
     String NOTIFICATION_SCHEDULE_DAY = "day";
@@ -121,19 +143,20 @@ public interface Definitions {
     String NOTIFICATION_ACTION_DATE = "actionDate";
     String NOTIFICATION_DISPLAYED_DATE = "displayedDate";
     String NOTIFICATION_DISMISSED_DATE = "dismissedDate";
-    String NOTIFICATION_MEDIA_ACTION = "mediaAction";
 
     String NOTIFICATION_ID = "id";
+    String NOTIFICATION_RANDOM_ID = "randomId";
     String NOTIFICATION_LAYOUT = "notificationLayout";
     String NOTIFICATION_TITLE = "title";
     String NOTIFICATION_BODY = "body";
+    String NOTIFICATION_TIMESTAMP = "timestamp";
     String NOTIFICATION_SUMMARY = "summary";
-    String NOTIFICATION_SHOW_WHEN = "showWen";
-    String NOTIFICATION_ACTION_KEY = "actionKey";
-    String NOTIFICATION_ACTION_INPUT = "actionInput";
+    String NOTIFICATION_SHOW_WHEN = "showWhen";
+    String NOTIFICATION_BUTTON_KEY_PRESSED = "buttonKeyPressed";
+    String NOTIFICATION_BUTTON_KEY_INPUT = "buttonKeyInput";
     String NOTIFICATION_JSON = "notificationJson";
 
-    String NOTIFICATION_ACTION_BUTTONS = "actionButtons";
+    String NOTIFICATION_MESSAGES = "messages";
     String NOTIFICATION_BUTTON_KEY = "key";
     String NOTIFICATION_BUTTON_ICON = "icon";
     String NOTIFICATION_BUTTON_LABEL = "label";
@@ -141,15 +164,23 @@ public interface Definitions {
 
     String NOTIFICATION_PAYLOAD = "payload";
     String NOTIFICATION_INITIAL_FIXED_DATE = "fixedDate";
+
     String NOTIFICATION_INITIAL_DATE_TIME = "initialDateTime";
-    String NOTIFICATION_CRONTAB_SCHEDULE = "crontabSchedule";
+    String NOTIFICATION_EXPIRATION_DATE_TIME = "expirationDateTime";
+    String NOTIFICATION_CRONTAB_EXPRESSION = "crontabExpression";
     String NOTIFICATION_PRECISE_SCHEDULES = "preciseSchedules";
     String NOTIFICATION_ENABLED = "enabled";
-    String NOTIFICATION_AUTO_CANCEL = "autoCancel";
+    String NOTIFICATION_AUTO_DISMISSIBLE = "autoDismissible";
+    String NOTIFICATION_IS_DANGEROUS_OPTION = "isDangerousOption";
+    String NOTIFICATION_PERMISSIONS = "permissions";
+
+    String NOTIFICATION_SHOW_IN_COMPACT_VIEW = "showInCompactView";
     String NOTIFICATION_LOCKED = "locked";
     String NOTIFICATION_DISPLAY_ON_FOREGROUND = "displayOnForeground";
     String NOTIFICATION_DISPLAY_ON_BACKGROUND = "displayOnBackground";
     String NOTIFICATION_ICON = "icon";
+    String NOTIFICATION_FULL_SCREEN_INTENT = "fullScreenIntent";
+    String NOTIFICATION_WAKE_UP_SCREEN = "wakeUpScreen";
     String NOTIFICATION_PLAY_SOUND = "playSound";
     String NOTIFICATION_SOUND_SOURCE = "soundSource";
     String NOTIFICATION_ENABLE_VIBRATION = "enableVibration";
@@ -158,6 +189,8 @@ public interface Definitions {
     String NOTIFICATION_GROUP_SORT = "groupSort";
     String NOTIFICATION_GROUP_ALERT_BEHAVIOR = "groupAlertBehavior";
     String NOTIFICATION_PRIVACY = "privacy";
+    String NOTIFICATION_CATEGORY = "category";
+    String NOTIFICATION_CUSTOM_SOUND = "customSound";
     String NOTIFICATION_DEFAULT_PRIVACY = "defaultPrivacy";
     String NOTIFICATION_DEFAULT_RINGTONE_TYPE = "defaultRingtoneType";
     String NOTIFICATION_PRIVATE_MESSAGE = "privateMessage";
@@ -166,6 +199,9 @@ public interface Definitions {
     String NOTIFICATION_CHANNEL_NAME = "channelName";
     String NOTIFICATION_CHANNEL_DESCRIPTION = "channelDescription";
     String NOTIFICATION_CHANNEL_SHOW_BADGE = "channelShowBadge";
+    String NOTIFICATION_CHANNEL_GROUP_NAME = "channelGroupName";
+    String NOTIFICATION_CHANNEL_GROUP_KEY = "channelGroupKey";
+    String NOTIFICATION_CHANNEL_CRITICAL_ALERTS = "criticalAlerts";
     String NOTIFICATION_IMPORTANCE = "importance";
     String NOTIFICATION_COLOR = "color";
     String NOTIFICATION_BACKGROUND_COLOR = "backgroundColor";
@@ -210,11 +246,15 @@ public interface Definitions {
         put(Definitions.NOTIFICATION_LED_OFF_MS, 700);
         put(Definitions.NOTIFICATION_LED_ON_MS, 300);
         put(Definitions.NOTIFICATION_PLAY_SOUND, true);
-        put(Definitions.NOTIFICATION_AUTO_CANCEL, true);
+        put(Definitions.NOTIFICATION_AUTO_DISMISSIBLE, true);
         put(Definitions.NOTIFICATION_DEFAULT_RINGTONE_TYPE, DefaultRingtoneType.Notification);
-        //put(Definitions.NOTIFICATION_LOCKED, false);
+        put(Definitions.NOTIFICATION_SCHEDULE_TIMEZONE, DateUtils.localTimeZone.toString());
         put(Definitions.NOTIFICATION_TICKER, "ticker");
         put(Definitions.NOTIFICATION_ALLOW_WHILE_IDLE, false);
         put(Definitions.NOTIFICATION_ONLY_ALERT_ONCE, false);
+        put(Definitions.NOTIFICATION_SHOW_IN_COMPACT_VIEW, true);
+        put(Definitions.NOTIFICATION_IS_DANGEROUS_OPTION, false);
+        put(Definitions.NOTIFICATION_WAKE_UP_SCREEN, false);
+        put(Definitions.NOTIFICATION_CHANNEL_CRITICAL_ALERTS, false);
     }};
 }
