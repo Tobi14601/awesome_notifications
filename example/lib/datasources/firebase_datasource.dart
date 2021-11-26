@@ -30,7 +30,7 @@ class FirebaseDataSource extends HttpDataSource {
 //   ///
 //   /// ************************************************************************************
 
-  Future<String> _pushNotification(
+  Future<String> _notificationModel(
       {required String firebaseServerKey, Map<String, dynamic> body = const {}}) async {
     if (firebaseServerKey.isEmpty) {
       return 'Server Key not defined';
@@ -59,7 +59,7 @@ class FirebaseDataSource extends HttpDataSource {
     required String body,
     Map<String, String> payload = const {}
   }) async {
-    return await _pushNotification(
+    return await _notificationModel(
         firebaseServerKey: firebaseServerKey,
         body: getFirebaseExampleContent(firebaseAppToken: firebaseAppToken));
   }
@@ -82,7 +82,7 @@ class FirebaseDataSource extends HttpDataSource {
               "https://avidabloga.files.wordpress.com/2012/08/emmemc3b3riadeneilarmstrong3.jpg",
           'bigPicture': "https://www.dw.com/image/49519617_303.jpg",
           'showWhen': true,
-          'autoCancel': true,
+          'autoDismissible': true,
           'privacy': 'Private'
         }
       }

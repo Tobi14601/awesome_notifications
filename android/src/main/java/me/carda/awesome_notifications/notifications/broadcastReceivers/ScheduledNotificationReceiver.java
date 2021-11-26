@@ -3,11 +3,13 @@ package me.carda.awesome_notifications.notifications.broadcastReceivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 //import com.google.common.reflect.TypeToken;
 
+import me.carda.awesome_notifications.AwesomeNotificationsPlugin;
 import me.carda.awesome_notifications.Definitions;
-import me.carda.awesome_notifications.notifications.models.PushNotification;
+import me.carda.awesome_notifications.notifications.models.NotificationModel;
 import me.carda.awesome_notifications.notifications.NotificationScheduler;
 import me.carda.awesome_notifications.notifications.NotificationSender;
 import me.carda.awesome_notifications.utils.StringUtils;
@@ -18,6 +20,7 @@ import me.carda.awesome_notifications.utils.StringUtils;
 
 public class ScheduledNotificationReceiver extends BroadcastReceiver {
 
+    static String TAG = "ScheduledNotificationReceiver";
 
     @Override
     public void onReceive(final Context context, Intent intent) {
@@ -28,25 +31,32 @@ public class ScheduledNotificationReceiver extends BroadcastReceiver {
         if (!StringUtils.isNullOrEmpty(notificationDetailsJson)) {
 
             try {
-                PushNotification pushNotification = new PushNotification().fromJson(notificationDetailsJson);
+                NotificationModel notificationModel = new NotificationModel().fromJson(notificationDetailsJson);
 
-                if(pushNotification == null){ return; }
+                if(notificationModel == null){ return; }
 
                 NotificationSender.send(
                     context,
-                    pushNotification
+                    notificationModel
                 );
 
-                if(pushNotification.schedule.repeats)
+                if(notificationModel.schedule.repeats)
                     NotificationScheduler.schedule(
                         context,
-                        pushNotification
+                        notificationModel
                     );
-                else
+                else {
+
+                    if(AwesomeNotificationsPlugin.debug)
+                        Log.d(TAG,
+                            "Schedule "+ notificationModel.content.id.toString() +
+                                    " finished since repeat option is off");
+
                     NotificationScheduler.cancelSchedule(
-                        context,
-                        pushNotification.content.id
+                            context,
+                            notificationModel.content.id
                     );
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();

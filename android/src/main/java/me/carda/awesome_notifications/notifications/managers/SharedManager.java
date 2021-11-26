@@ -15,19 +15,21 @@ import java.util.Map;
 
 import me.carda.awesome_notifications.Definitions;
 import me.carda.awesome_notifications.notifications.exceptions.AwesomeNotificationException;
-import me.carda.awesome_notifications.notifications.models.Model;
+import me.carda.awesome_notifications.notifications.models.AbstractModel;
 import me.carda.awesome_notifications.utils.StringUtils;
 
-public class SharedManager<T extends Model> {
+public class SharedManager<T extends AbstractModel> {
     private Class<T> clazz;
+    private String className;
 
     private static String TAG = "SharedManager";
     private String reference;
     private String hashedReference = "default";
 
-    public SharedManager(String fileIdentifier, Class<T> targetClass){
-        clazz = targetClass;
-        reference = Definitions.SHARED_MANAGER +"."+ fileIdentifier +"."+ clazz.getName();
+    public SharedManager(String fileIdentifier, Class<T> targetClass, String className){
+        this.clazz = targetClass;
+        this.className = className;
+        this.reference = Definitions.SHARED_MANAGER +"."+ fileIdentifier +"."+ className;
         try {
 
             MessageDigest m = MessageDigest.getInstance("MD5");
@@ -38,7 +40,7 @@ public class SharedManager<T extends Model> {
 
         } catch (Exception e) {
 
-            this.reference = fileIdentifier;
+            this.hashedReference = reference;
 
             Log.e(TAG, "SharedManager could not be initialized: "+ e.getMessage());
             e.printStackTrace();
@@ -48,7 +50,7 @@ public class SharedManager<T extends Model> {
     private SharedPreferences getSharedInstance(Context context) throws AwesomeNotificationException {
 
         SharedPreferences preferences = context.getSharedPreferences(
-                context.getPackageName() + "." + (hashedReference == null ? reference : hashedReference),
+                context.getPackageName() + "." + hashedReference,
                 Context.MODE_PRIVATE
         );
 
@@ -117,7 +119,7 @@ public class SharedManager<T extends Model> {
             if (!StringUtils.isNullOrEmpty(json)) {
                 T genericModel = clazz.newInstance();
 
-                Model parsedModel = genericModel.fromJson(json);
+                AbstractModel parsedModel = genericModel.fromJson(json);
                 if(parsedModel != null){
                     returnedObject = (T) parsedModel;
                 }
