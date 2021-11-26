@@ -2,26 +2,33 @@ package me.carda.awesome_notifications.notifications.models;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
 import me.carda.awesome_notifications.Definitions;
 import me.carda.awesome_notifications.AwesomeNotificationsPlugin;
-import me.carda.awesome_notifications.notifications.enumeratos.MediaSource;
-import me.carda.awesome_notifications.notifications.enumeratos.NotificationLayout;
-import me.carda.awesome_notifications.notifications.enumeratos.NotificationLifeCycle;
-import me.carda.awesome_notifications.notifications.enumeratos.NotificationPrivacy;
-import me.carda.awesome_notifications.notifications.enumeratos.NotificationSource;
+import me.carda.awesome_notifications.notifications.enumerators.MediaSource;
+import me.carda.awesome_notifications.notifications.enumerators.NotificationCategory;
+import me.carda.awesome_notifications.notifications.enumerators.NotificationLayout;
+import me.carda.awesome_notifications.notifications.enumerators.NotificationLifeCycle;
+import me.carda.awesome_notifications.notifications.enumerators.NotificationPrivacy;
+import me.carda.awesome_notifications.notifications.enumerators.NotificationSource;
 import me.carda.awesome_notifications.notifications.exceptions.AwesomeNotificationException;
 import me.carda.awesome_notifications.notifications.managers.ChannelManager;
 import me.carda.awesome_notifications.utils.BitmapUtils;
 import me.carda.awesome_notifications.utils.DateUtils;
+import me.carda.awesome_notifications.utils.IntegerUtils;
+import me.carda.awesome_notifications.utils.ListUtils;
 import me.carda.awesome_notifications.utils.MapUtils;
 import me.carda.awesome_notifications.utils.StringUtils;
 
 @SuppressWarnings("unchecked")
-public class NotificationContentModel extends Model {
+public class NotificationContentModel extends AbstractModel {
+
+    public boolean isRefreshNotification = false;
+    public boolean isRandomId = false;
 
     public Integer id;
     public String channelKey;
@@ -29,15 +36,19 @@ public class NotificationContentModel extends Model {
     public String body;
     public String summary;
     public Boolean showWhen;
-    public List<Object> actionButtons;
+    public List<NotificationMessageModel> messages;
     public Map<String, String> payload;
+    public String groupKey;
+    public String customSound;
     public Boolean playSound;
     public String icon;
     public String largeIcon;
     public Boolean locked;
     public String bigPicture;
+    public Boolean wakeUpScreen;
+    public Boolean fullScreenIntent;
     public Boolean hideLargeIconOnExpand;
-    public Boolean autoCancel;
+    public Boolean autoDismissible;
     public Boolean displayOnForeground;
     public Boolean displayOnBackground;
     public Long color;
@@ -50,9 +61,13 @@ public class NotificationContentModel extends Model {
 
     public NotificationLayout notificationLayout;
 
+    public NotificationCategory notificationCategory;
+
     public NotificationSource createdSource;
     public NotificationLifeCycle createdLifeCycle;
     public NotificationLifeCycle displayedLifeCycle;
+    public NotificationCategory category;
+
     public String createdDate;
     public String displayedDate;
 
@@ -60,6 +75,11 @@ public class NotificationContentModel extends Model {
 
     @Override
     public NotificationContentModel fromMap(Map<String, Object> arguments) {
+
+        id = getValueOrDefault(arguments, Definitions.NOTIFICATION_ID, Integer.class);
+        if(id < 0) {
+            id = IntegerUtils.generateNextRandomId();
+        }
 
         createdDate = MapUtils.extractValue(arguments, Definitions.NOTIFICATION_CREATED_DATE, String.class)
                             .or(DateUtils.getUTCDate());
@@ -80,12 +100,16 @@ public class NotificationContentModel extends Model {
         color = getValueOrDefault(arguments, Definitions.NOTIFICATION_COLOR, Long.class);
         backgroundColor = getValueOrDefault(arguments, Definitions.NOTIFICATION_BACKGROUND_COLOR, Long.class);
 
-        id    = getValueOrDefault(arguments, Definitions.NOTIFICATION_ID, Integer.class);
+
         title = getValueOrDefault(arguments, Definitions.NOTIFICATION_TITLE, String.class);
         body  = getValueOrDefault(arguments, Definitions.NOTIFICATION_BODY, String.class);
         summary = getValueOrDefault(arguments, Definitions.NOTIFICATION_SUMMARY, String.class);
 
         playSound = getValueOrDefault(arguments, Definitions.NOTIFICATION_PLAY_SOUND, Boolean.class);
+        customSound = getValueOrDefault(arguments, Definitions.NOTIFICATION_CUSTOM_SOUND, String.class);
+
+        wakeUpScreen = getValueOrDefault(arguments, Definitions.NOTIFICATION_WAKE_UP_SCREEN, Boolean.class);
+        fullScreenIntent = getValueOrDefault(arguments, Definitions.NOTIFICATION_FULL_SCREEN_INTENT, Boolean.class);
 
         showWhen = getValueOrDefault(arguments, Definitions.NOTIFICATION_SHOW_WHEN, Boolean.class);
         locked = getValueOrDefault(arguments, Definitions.NOTIFICATION_LOCKED, Boolean.class);
@@ -101,21 +125,26 @@ public class NotificationContentModel extends Model {
         privacy =
                 getEnumValueOrDefault(arguments, Definitions.NOTIFICATION_PRIVACY, NotificationPrivacy.class, NotificationPrivacy.values());
 
+        category =
+                getEnumValueOrDefault(arguments, Definitions.NOTIFICATION_CATEGORY, NotificationCategory.class, NotificationCategory.values());
+
         privateMessage = getValueOrDefault(arguments, Definitions.NOTIFICATION_PRIVATE_MESSAGE, String.class);
 
         icon  = getValueOrDefault(arguments, Definitions.NOTIFICATION_ICON, String.class);
         largeIcon  = getValueOrDefault(arguments, Definitions.NOTIFICATION_LARGE_ICON, String.class);
         bigPicture = getValueOrDefault(arguments, Definitions.NOTIFICATION_BIG_PICTURE, String.class);
 
-        actionButtons = getValueOrDefault(arguments, Definitions.NOTIFICATION_ACTION_BUTTONS, List.class);
-
         payload = getValueOrDefault(arguments, Definitions.NOTIFICATION_PAYLOAD, Map.class);
 
-        autoCancel = getValueOrDefault(arguments, Definitions.NOTIFICATION_AUTO_CANCEL, Boolean.class);
+        autoDismissible = getValueOrDefault(arguments, Definitions.NOTIFICATION_AUTO_DISMISSIBLE, Boolean.class);
 
         progress    = getValueOrDefault(arguments, Definitions.NOTIFICATION_PROGRESS, Integer.class);
 
+        groupKey = getValueOrDefault(arguments, Definitions.NOTIFICATION_GROUP_KEY, String.class);
+
         ticker = getValueOrDefault(arguments, Definitions.NOTIFICATION_TICKER, String.class);
+
+        messages = mapToMessages(getValueOrDefault(arguments, Definitions.NOTIFICATION_MESSAGES, List.class));
 
         return this;
     }
@@ -125,19 +154,24 @@ public class NotificationContentModel extends Model {
         Map<String, Object> returnedObject = new HashMap<>();
 
         returnedObject.put(Definitions.NOTIFICATION_ID, this.id);
+        returnedObject.put(Definitions.NOTIFICATION_RANDOM_ID, this.isRandomId);
         returnedObject.put(Definitions.NOTIFICATION_TITLE, this.title);
         returnedObject.put(Definitions.NOTIFICATION_BODY, this.body);
         returnedObject.put(Definitions.NOTIFICATION_SUMMARY, this.summary);
 
         returnedObject.put(Definitions.NOTIFICATION_SHOW_WHEN, this.showWhen);
+        returnedObject.put(Definitions.NOTIFICATION_WAKE_UP_SCREEN, this.wakeUpScreen);
+        returnedObject.put(Definitions.NOTIFICATION_FULL_SCREEN_INTENT, this.fullScreenIntent);
+
 
         returnedObject.put(Definitions.NOTIFICATION_LOCKED, this.locked);
 
         returnedObject.put(Definitions.NOTIFICATION_PLAY_SOUND, this.playSound);
+        returnedObject.put(Definitions.NOTIFICATION_CUSTOM_SOUND, this.customSound);
 
         returnedObject.put(Definitions.NOTIFICATION_TICKER, this.ticker);
         returnedObject.put(Definitions.NOTIFICATION_PAYLOAD, this.payload);
-        returnedObject.put(Definitions.NOTIFICATION_AUTO_CANCEL, this.autoCancel);
+        returnedObject.put(Definitions.NOTIFICATION_AUTO_DISMISSIBLE, this.autoDismissible);
 
         returnedObject.put(Definitions.NOTIFICATION_LAYOUT,
                 this.notificationLayout != null ? this.notificationLayout.toString() : "Default");
@@ -154,11 +188,14 @@ public class NotificationContentModel extends Model {
         returnedObject.put(Definitions.NOTIFICATION_DISPLAYED_DATE, this.displayedDate);
         returnedObject.put(Definitions.NOTIFICATION_CREATED_DATE, this.createdDate);
 
-        if(this.actionButtons != null)
-            returnedObject.put(Definitions.NOTIFICATION_ACTION_BUTTONS, this.actionButtons);
+        returnedObject.put(Definitions.NOTIFICATION_CHANNEL_KEY, this.channelKey);
 
-        if(this.autoCancel != null)
-            returnedObject.put(Definitions.NOTIFICATION_AUTO_CANCEL, this.autoCancel);
+        if(this.category != null)
+            returnedObject.put(Definitions.NOTIFICATION_CATEGORY,
+                    this.category.toString());
+
+        if(this.autoDismissible != null)
+            returnedObject.put(Definitions.NOTIFICATION_AUTO_DISMISSIBLE, this.autoDismissible);
 
         if(this.displayOnForeground != null)
             returnedObject.put(Definitions.NOTIFICATION_DISPLAY_ON_FOREGROUND, this.displayOnForeground);
@@ -183,17 +220,41 @@ public class NotificationContentModel extends Model {
         if(this.progress != null)
             returnedObject.put(Definitions.NOTIFICATION_PROGRESS, this.progress);
 
-        if(this.channelKey != null)
-            returnedObject.put(Definitions.NOTIFICATION_CHANNEL_KEY, this.channelKey);
+        if(this.groupKey != null)
+            returnedObject.put(Definitions.NOTIFICATION_GROUP_KEY, this.groupKey);
 
         if(this.privacy != null)
             returnedObject.put(Definitions.NOTIFICATION_PRIVACY,
-                    this.privacy != null ? this.privacy.toString() : null);
+                    this.privacy.toString());
 
         if(this.privateMessage != null)
             returnedObject.put(Definitions.NOTIFICATION_PRIVATE_MESSAGE, this.privateMessage);
 
+        if(this.messages != null)
+            returnedObject.put(Definitions.NOTIFICATION_MESSAGES, messagesToMap(this.messages));
+
         return returnedObject;
+    }
+
+    public static List<Map> messagesToMap(List<NotificationMessageModel> messages){
+        List<Map> returnedMessages = new ArrayList<>();
+        if(!ListUtils.isNullOrEmpty(messages)){
+            for (NotificationMessageModel messageModel : messages) {
+                returnedMessages.add(messageModel.toMap());
+            }
+        }
+        return returnedMessages;
+    }
+
+    public static List<NotificationMessageModel> mapToMessages(List<Map> messagesData){
+        List<NotificationMessageModel> messages = new ArrayList<>();
+        if(!ListUtils.isNullOrEmpty(messagesData))
+            for(Map<String, Object> messageData : messagesData){
+                NotificationMessageModel messageModel =
+                        new NotificationMessageModel().fromMap(messageData);
+                messages.add(messageModel);
+            }
+        return messages;
     }
 
     @Override
@@ -210,7 +271,7 @@ public class NotificationContentModel extends Model {
     public void validate(Context context) throws AwesomeNotificationException {
 
         if(ChannelManager.getChannelByKey(context, channelKey) == null)
-            throw new AwesomeNotificationException("Notification channel '"+channelKey+"' does not exists.");
+            throw new AwesomeNotificationException("Notification channel '"+channelKey+"' does not exist.");
 
         validateIcon(context);
 

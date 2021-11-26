@@ -4,7 +4,6 @@ import android.content.Context;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -45,8 +44,7 @@ public class NotificationCalendarModel extends NotificationScheduleModel {
     @Override
     @SuppressWarnings("unchecked")
     public NotificationCalendarModel fromMap(Map<String, Object> arguments) {
-
-        timeZone = getValueOrDefault(arguments, Definitions.NOTIFICATION_SCHEDULE_TIMEZONE, String.class);
+        super.fromMap(arguments);
 
         era = getValueOrDefault(arguments, Definitions.NOTIFICATION_SCHEDULE_ERA, Integer.class);
         year = getValueOrDefault(arguments, Definitions.NOTIFICATION_SCHEDULE_YEAR, Integer.class);
@@ -59,9 +57,6 @@ public class NotificationCalendarModel extends NotificationScheduleModel {
         weekday = getValueOrDefault(arguments, Definitions.NOTIFICATION_SCHEDULE_WEEKDAY, Integer.class);
         weekOfMonth = getValueOrDefault(arguments, Definitions.NOTIFICATION_SCHEDULE_WEEKOFMONTH, Integer.class);
         weekOfYear = getValueOrDefault(arguments, Definitions.NOTIFICATION_SCHEDULE_WEEKOFYEAR, Integer.class);
-
-        repeats = getValueOrDefault(arguments, Definitions.NOTIFICATION_SCHEDULE_REPEATS, Boolean.class);
-        allowWhileIdle = getValueOrDefault(arguments, Definitions.NOTIFICATION_ALLOW_WHILE_IDLE, Boolean.class);
 
         if(era != null && era < 0){ era = null; }
         if(year != null && year < 0){ year = null; }
@@ -83,7 +78,7 @@ public class NotificationCalendarModel extends NotificationScheduleModel {
 
     @Override
     public Map<String, Object> toMap(){
-        Map<String, Object> returnedObject = new HashMap<>();
+        Map<String, Object> returnedObject = super.toMap();
 
         returnedObject.put(Definitions.NOTIFICATION_SCHEDULE_TIMEZONE, timeZone);
         returnedObject.put(Definitions.NOTIFICATION_SCHEDULE_ERA, era);
@@ -98,9 +93,6 @@ public class NotificationCalendarModel extends NotificationScheduleModel {
         returnedObject.put(Definitions.NOTIFICATION_SCHEDULE_WEEKOFYEAR, weekOfYear);
 
         returnedObject.put(Definitions.NOTIFICATION_SCHEDULE_WEEKDAY, weekday == null ? null : (weekday == 1 ? 7 : (weekday - 1)));
-
-        returnedObject.put(Definitions.NOTIFICATION_SCHEDULE_REPEATS, repeats);
-        returnedObject.put(Definitions.NOTIFICATION_ALLOW_WHILE_IDLE, allowWhileIdle);
 
         return returnedObject;
     }

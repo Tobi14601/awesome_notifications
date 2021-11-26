@@ -1,5 +1,9 @@
+import 'dart:ui';
+
+import 'package:awesome_notifications/src/definitions.dart';
 import 'package:awesome_notifications/src/enumerators/action_button_type.dart';
 import 'package:awesome_notifications/src/enumerators/media_source.dart';
+import 'package:awesome_notifications/src/exceptions/awesome_exception.dart';
 import 'package:awesome_notifications/src/models/model.dart';
 import 'package:awesome_notifications/src/utils/assert_utils.dart';
 import 'package:awesome_notifications/src/utils/bitmap_utils.dart';
@@ -20,27 +24,45 @@ class NotificationActionButton extends Model {
   String? label;
   String? icon;
   bool? enabled;
-  bool? autoCancel;
-  ActionButtonType buttonType;
+  bool? autoDismissible;
+  bool? showInCompactView;
+  bool? isDangerousOption;
+  Color? color;
+  ActionButtonType? buttonType;
 
   NotificationActionButton(
-      {this.key,
+      {required String key,
+      required String label,
       this.icon,
-      this.label,
       this.enabled,
-      this.autoCancel,
-      this.buttonType = ActionButtonType.Default});
+      this.autoDismissible,
+      this.showInCompactView,
+      this.isDangerousOption,
+      this.color,
+      this.buttonType = ActionButtonType.Default}) {
+    this.key = key;
+    this.label = label;
+  }
 
   @override
   NotificationActionButton? fromMap(Map<String, dynamic> dataMap) {
-    key = AssertUtils.extractValue(dataMap, 'key');
-    icon = AssertUtils.extractValue(dataMap, 'icon');
-    label = AssertUtils.extractValue(dataMap, 'label');
-    enabled = AssertUtils.extractValue(dataMap, 'enabled');
-    autoCancel = AssertUtils.extractValue(dataMap, 'autoCancel');
+    key = AssertUtils.extractValue(NOTIFICATION_KEY, dataMap, String);
+    icon = AssertUtils.extractValue(NOTIFICATION_ICON, dataMap, String);
+    label =
+        AssertUtils.extractValue(NOTIFICATION_BUTTON_LABEL, dataMap, String);
+    enabled = AssertUtils.extractValue(NOTIFICATION_ENABLED, dataMap, bool);
+    autoDismissible =
+        AssertUtils.extractValue(NOTIFICATION_AUTO_DISMISSIBLE, dataMap, bool);
+    showInCompactView = AssertUtils.extractValue(
+        NOTIFICATION_SHOW_IN_COMPACT_VIEW, dataMap, bool);
+    isDangerousOption = AssertUtils.extractValue(
+        NOTIFICATION_IS_DANGEROUS_OPTION, dataMap, bool);
     buttonType = AssertUtils.extractEnum(
-            dataMap, 'buttonType', ActionButtonType.values) ??
-        ActionButtonType.Default;
+        NOTIFICATION_BUTTON_TYPE, dataMap, ActionButtonType.values);
+
+    int? colorValue =
+        AssertUtils.extractValue(NOTIFICATION_COLOR, dataMap, int);
+    this.color = colorValue == null ? null : Color(colorValue);
 
     return this;
   }
@@ -48,23 +70,36 @@ class NotificationActionButton extends Model {
   @override
   Map<String, dynamic> toMap() {
     return {
-      'key': key,
-      'icon': icon,
-      'label': label,
-      'enabled': enabled,
-      'autoCancel': autoCancel,
-      'buttonType': AssertUtils.toSimpleEnumString(buttonType)
+      NOTIFICATION_KEY: key,
+      NOTIFICATION_ICON: icon,
+      NOTIFICATION_BUTTON_LABEL: label,
+      NOTIFICATION_ENABLED: enabled,
+      NOTIFICATION_AUTO_DISMISSIBLE: autoDismissible,
+      NOTIFICATION_SHOW_IN_COMPACT_VIEW: showInCompactView,
+      NOTIFICATION_IS_DANGEROUS_OPTION: isDangerousOption,
+      NOTIFICATION_BUTTON_TYPE: AssertUtils.toSimpleEnumString(buttonType),
+      NOTIFICATION_COLOR: color?.value
     };
   }
 
   @override
   void validate() {
-    assert(!AssertUtils.isNullOrEmptyOrInvalid(key, String));
-    assert(!AssertUtils.isNullOrEmptyOrInvalid(label, String));
-    assert(!AssertUtils.isNullOrEmptyOrInvalid(autoCancel, bool));
+    if (AssertUtils.isNullOrEmptyOrInvalid(key, String))
+      throw AwesomeNotificationsException(message: 'key id is requried');
+    if (AssertUtils.isNullOrEmptyOrInvalid(label, String))
+      throw AwesomeNotificationsException(message: 'label id is requried');
+    if (AssertUtils.isNullOrEmptyOrInvalid(autoDismissible, bool))
+      throw AwesomeNotificationsException(
+          message: 'autoDismissible id is requried');
+    if (AssertUtils.isNullOrEmptyOrInvalid(showInCompactView, bool))
+      throw AwesomeNotificationsException(
+          message: 'showInCompactView id is requried');
 
     // For action buttons, it's only allowed resource media types
-    assert(StringUtils.isNullOrEmpty(icon) ||
-        BitmapUtils().getMediaSource(icon!) == MediaSource.Resource);
+    if (!StringUtils.isNullOrEmpty(icon) &&
+        BitmapUtils().getMediaSource(icon!) != MediaSource.Resource)
+      throw AwesomeNotificationsException(
+          message:
+              'icons for action buttons must be a native resource media type');
   }
 }

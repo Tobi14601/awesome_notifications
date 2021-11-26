@@ -1,4 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:awesome_notifications/src/exceptions/awesome_exception.dart';
 import 'package:awesome_notifications/src/models/notification_schedule.dart';
 import 'package:awesome_notifications/src/utils/assert_utils.dart';
 
@@ -7,29 +8,31 @@ class NotificationInterval extends NotificationSchedule {
   int? interval;
 
   /// Notification Schedule based on calendar components. At least one date parameter is required.
+  /// [interval] Time interval between each notification (minimum of 60 sec case repeating)
+  /// [allowWhileIdle] Displays the notification, even when the device is low battery
+  /// [repeats] Defines if the notification should play only once or keeps repeating
+  /// [preciseAlarm] Requires maximum precision to schedule notifications at exact time, but may use more battery. Requires the explicit user consent for Android 12 and beyond.
   /// [timeZone] time zone identifier as reference of this schedule date. (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
-  NotificationInterval({
-    this.interval,
-    String? timeZone,
-    bool allowWhileIdle = false,
-    bool repeats = false,
-  }) : super(
+  NotificationInterval(
+      {required int interval,
+      String? timeZone,
+      bool allowWhileIdle = false,
+      bool repeats = false,
+      bool preciseAlarm = false})
+      : super(
             timeZone: timeZone ?? AwesomeNotifications.localTimeZoneIdentifier,
             allowWhileIdle: allowWhileIdle,
-            repeats: repeats);
+            repeats: repeats,
+            preciseAlarm: preciseAlarm) {
+    this.interval = interval;
+  }
 
   @override
   NotificationInterval? fromMap(Map<String, dynamic> dataMap) {
-    this.timeZone =
-        AssertUtils.extractValue(dataMap, NOTIFICATION_SCHEDULE_TIMEZONE);
-    this.interval =
-        AssertUtils.extractValue(dataMap, NOTIFICATION_SCHEDULE_INTERVAL);
-    this.repeats =
-        AssertUtils.extractValue(dataMap, NOTIFICATION_SCHEDULE_REPEATS) ??
-            false;
-    this.allowWhileIdle = AssertUtils.extractValue(
-            dataMap, NOTIFICATION_SCHEDULE_ALLOW_WHILE_IDLE) ??
-        false;
+    super.fromMap(dataMap);
+
+    this.interval = AssertUtils.extractValue(
+        NOTIFICATION_SCHEDULE_INTERVAL, dataMap, String);
 
     try {
       validate();
@@ -42,14 +45,8 @@ class NotificationInterval extends NotificationSchedule {
 
   @override
   Map<String, dynamic> toMap() {
-    Map<String, dynamic> dataMap = {
-      NOTIFICATION_SCHEDULE_TIMEZONE: this.timeZone,
-      NOTIFICATION_SCHEDULE_ALLOW_WHILE_IDLE: this.allowWhileIdle,
-      NOTIFICATION_SCHEDULE_INTERVAL: this.interval,
-      NOTIFICATION_SCHEDULE_REPEATS: this.repeats
-    };
-
-    return dataMap;
+    Map<String, dynamic> map = super.toMap();
+    return map..addAll({NOTIFICATION_SCHEDULE_INTERVAL: this.interval});
   }
 
   @override
@@ -59,6 +56,12 @@ class NotificationInterval extends NotificationSchedule {
 
   @override
   void validate() {
-    assert((this.interval ?? -1) >= 0);
+    if ((this.interval ?? -1) < 0)
+      throw AwesomeNotificationsException(
+          message: 'interval must be greater or equal to zero.');
+
+    if (this.repeats && (this.interval ?? 0) < 60)
+      throw AwesomeNotificationsException(
+          message: 'time interval must be greater or equal to 60 if repeating');
   }
 }

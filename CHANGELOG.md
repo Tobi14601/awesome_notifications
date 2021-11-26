@@ -1,3 +1,62 @@
+## [0.6.18+2]
+* Update readme file and PermissionManager to be compatible with Android 12 and Java 7
+## [0.6.18+1]
+* Java lambda expressions removed to turn Android source compatible with old Java 7
+## [0.6.18]
+* Added Channel's Group feature for Android
+* Added notification's category feature for Android
+* Added fullScreenIntent permission and content option to allow to show notifications in full screen mode.
+* Added PreciseAlarms permission and sheculde option to allow to show scheduled notifications with more precision.
+* Added showPage methods to provide shortcuts to channel permissions page and alarm permission page.
+* Added shouldShowRationale method for android to check if the requested permissions require user intervention to be enable.
+* Added request permissions methods to demand the users permissions considered dangerous by the system.
+* Permission's request methods refactored to enable a more modular and scalable evolution to comport future permissions for Android
+* Documentation has been improved with the new permissions methods, channel's group, notification categories, fullScreenIntent and PreciseAlarms permissions
+## [0.6.17]
+* Added wakeUpScreen option in notification content to wake up screen when a notification is displayed (Requires to add WAKE_LOCK permission into AndroidManifest.xml).
+* Added custom permissions for method requestPermissionToSendNotifications (has no effect on Android).
+* Documentation has been improved with wakeUpScreen option
+## [0.6.16]
+* Media button receiver removed from AndroidManifest.xml due incompatibility with some Galaxy models and another plugins (#81 and #320)
+* Documentation on scheduling notifications has been improved
+## [0.6.15]
+* PushNotification class deprecated, as all push features are being moved to the new companion plugin. Instead, use NotificationModel.
+* Added isDangerousOption for action buttons, to color the text in red to indicate a dangerous option for the user.
+* Added color option for action buttons, to color the text in Android 8.0 Oreo and beyond (has no effect on iOS).
+* Fix for issue #321, when a new notification is erroneously created when the user taps on notification action button.
+## [0.6.14]
+* Added validation to prevent scheduling with repeating intervals smaller than 60 seconds (iOS restriction)
+* Added crontab schedule to allow complex schedules based on initial and expiration date, a list of precise dates, or a crontab expression, and all four options can be combined together (only for Android)
+* Defined the final standard to replace negative IDs by random values
+* Minimum Android requirements increased to SDK 23 (Android 6.0 Marshmallow) due to new cancellation methods with unsecure procedures on API prior 23
+## [0.6.13]
+* Added messaging layout and messaging group layout
+* Added method showNotificationPage to programmatically redirect the user to O.S. notifications permission page
+* Minimum Android requirements increased to SDK 21 (Android 5.0 Lollipop) due to new cancellation methods
+* Added new cancellation methods (dismiss, cancel schedules and cancel all (dismiss and schedules at same time))) based on group key or channel key
+* Property "autoCancel" changed to "autoDismissable", to match the new cancellation methods naming principles
+* Added internal group key based on ID, to prevent Android auto grouping with 4+ notification from same channel when group key was not specified
+* Android channels refactored to keep the original channel key at maximum as possible, maximizing the compatibility with another plugins.
+* Models refactored to follow the native standards and transformations from map data
+* Calendar millisecond precision has been deprecated, due devices do not provide or ignore such precision.
+* Added error handling for image assets (iOS)
+* Added video tutorial into README file
+* Version numbering has changed to better translate the stage of development for future releases.
+## [0.0.6+12]
+* Added showInCompactView property for MediaPlayer buttons
+* Added support to multiple subscriptions on created, displayed, action and dissmissed stream
+* Removed channel key from Android Badge methods, because the segregation in channel keys was never used (now is all global)
+* Added increment and decrement badge methods (more performatic)
+## [0.0.6+11]
+* Fix Android reschedules on startup process (issue #285)
+* Improved Android channels to manage another package channels and convert then to the new standard, using channelKey as hashKey produced from digest channel content
+## [0.0.6+10]
+* Added foreground services for Android
+* Fixed android reference for guava package
+## [0.0.6+9]
+* Fixed null reference for main class inside NotificationBuilder.java
+## [0.0.6+8]
+* Fixed null reference for main class
 ## [0.0.6+7]
 * Documentation improved
 * Push notifications from example app updated

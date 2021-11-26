@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class StringUtils {
 
@@ -16,7 +17,9 @@ public class StringUtils {
     }
 
     public static String digestString(String reference){
+
         MessageDigest md = null;
+        final String MD5 = "MD5";
 
         try {
             reference = reference.replaceAll("\\W+", "");
@@ -26,7 +29,7 @@ public class StringUtils {
                 bytes = reference.getBytes(StandardCharsets.UTF_8);
             }
 
-            md = MessageDigest.getInstance("MD5");
+            md = MessageDigest.getInstance(MD5);
             md.reset();
             md.update(bytes);
 
@@ -37,5 +40,15 @@ public class StringUtils {
             //("MD5 Cryptography Not Supported");
             return reference;
         }
+    }
+
+    public static <T extends Enum<T>> T getEnumFromString(Class<T> clazz, String string) {
+        if( clazz != null && string != null ) {
+            try {
+                return Enum.valueOf(clazz, string.trim());
+            } catch(IllegalArgumentException ex) {
+            }
+        }
+        return null;
     }
 }
